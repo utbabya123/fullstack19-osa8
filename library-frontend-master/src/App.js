@@ -11,6 +11,7 @@ const ALL_AUTHORS = gql`
       name
       born
       bookCount
+      id
     }
   }
 `
@@ -21,6 +22,7 @@ const ALL_BOOKS = gql`
       title
       author
       published
+      id
     }
   }
 `
@@ -37,6 +39,21 @@ const CREATE_BOOK = gql`
       author
       published
       genres
+      id
+    }
+  }
+`
+
+const EDIT_AUTHOR = gql`
+  mutation editAuthor($name: String!, $setBornTo: Int!) {
+    editAuthor(
+      name: $name,
+      setBornTo: $setBornTo
+    ) {
+      name
+      born
+      bookCount
+      id
     }
   }
 `
@@ -53,6 +70,8 @@ const App = () => {
     refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }]
   })
 
+  const [editAuthor] = useMutation(EDIT_AUTHOR)
+
   return (
     <div>
       <div>
@@ -64,6 +83,7 @@ const App = () => {
       <Authors
         show={page === 'authors'}
         result={authors}
+        editAuthor={editAuthor}
       />
 
       <Books
