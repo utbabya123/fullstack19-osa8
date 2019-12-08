@@ -1,5 +1,5 @@
 require('dotenv').config()
-const { ApolloServer, gql } = require('apollo-server')
+const { ApolloServer, UserInputError, gql } = require('apollo-server')
 const mongoose = require('mongoose')
 const Book = require('./models/book')
 const Author = require('./models/author')
@@ -9,7 +9,7 @@ mongoose.set('useFindAndModify', false)
 
 console.log('connecting to', MONGODB_URI)
 
-mongoose.connect(yMONGODB_URI, { useNewUrlParser: true })
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true })
   .then(() => {
     console.log('connected to MongoDB')
   })
@@ -85,8 +85,10 @@ const resolvers = {
         await book.save()
 
         return book
-      } catch (e) {
-        console.log(e)
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
+        })
       }
     },
     editAuthor: async (root, args) => {
@@ -96,8 +98,10 @@ const resolvers = {
         await author.save()
 
         return author
-      } catch (e) {
-        console.log(e)
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
+        })
       }
     }
   }
