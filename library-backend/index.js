@@ -1,11 +1,11 @@
+require('dotenv').config()
 const { ApolloServer, gql } = require('apollo-server')
 const mongoose = require('mongoose')
 const Book = require('./models/book')
 const Author = require('./models/author')
 
+const MONGODB_URI = process.env.MONGODB_URI
 mongoose.set('useFindAndModify', false)
-
-const MONGODB_URI = 'mongodb+srv://fullstack:porkkana123@cluster0-tgw38.mongodb.net/library?retryWrites=true'
 
 console.log('connecting to', MONGODB_URI)
 
