@@ -5,6 +5,7 @@ import Authors from './components/Authors'
 import Books from './components/Books'
 import NewBook from './components/NewBook'
 import LoginForm from './components/LoginForm'
+import Recommendation from './components/Recommendation'
 
 const ALL_AUTHORS = gql`
   {
@@ -23,6 +24,7 @@ const ALL_BOOKS = gql`
       title
       published
       id
+      genres
       author {
         name
         id
@@ -77,21 +79,29 @@ const LOGIN = gql`
   }
 `
 
+const USER = gql`
+  query {
+    me {
+      username
+      favoriteGenre
+      id
+    }
+  }
+`
+
 const App = () => {
   const client = useApolloClient()
-
   const [page, setPage] = useState('authors')
   const [token, setToken] = useState(null)
 
+  const { refetch, ...user } = useQuery(USER)
   const authors = useQuery(ALL_AUTHORS)
   const books = useQuery(ALL_BOOKS)
 
   const [addBook] = useMutation(CREATE_BOOK, {
     refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }]
   })
-
   const [editAuthor] = useMutation(EDIT_AUTHOR)
-
   const [login] = useMutation(LOGIN)
 
   useEffect(() => {
@@ -101,10 +111,15 @@ const App = () => {
     }
   }, [])
 
+  useEffect(() => {
+    refetch()
+  }, [token])
+
   const logout = () => {
     setToken(null)
     localStorage.clear()
     client.resetStore()
+    setPage('authors')
   }
 
   return (
@@ -112,7 +127,9 @@ const App = () => {
       <div>
         <button onClick={() => setPage('authors')}>authors</button>
         <button onClick={() => setPage('books')}>books</button>
+
         {token ? <button onClick={() => setPage('add')}>add book</button> : null}
+        {token ? <button onClick={() => setPage('recommend')}>recommend</button> : null}
         {token ? <button onClick={logout}>logout</button> : <button onClick={() => setPage('login')}>login</button>}
       </div>
 
@@ -137,6 +154,12 @@ const App = () => {
         setToken={setToken}
         login={login}
         setPage={setPage}
+      />
+
+      <Recommendation
+        show={page === 'recommend'}
+        user={user}
+        books={books}
       />
 
     </div>
