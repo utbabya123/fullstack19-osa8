@@ -114,8 +114,8 @@ const resolvers = {
 
         const book = new Book({ ...args, author: author._id })
         await book.save()
-
-        return book
+        const populatedBook = await book.populate('author').execPopulate()
+        return populatedBook
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args,
