@@ -10,7 +10,7 @@ const NewBook = (props) => {
   if (!props.show) {
     return null
   }
-
+  
   const submit = async (e) => {
     e.preventDefault()
     await props.addBook({
